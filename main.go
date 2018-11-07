@@ -8,7 +8,7 @@ import (
 
 	"github.com/alecthomas/kingpin"
 	zglob "github.com/mattn/go-zglob"
-	"github.com/sergi/go-diff/diffmatchpatch"
+	"github.com/pmezard/go-difflib/difflib"
 	json "github.com/virtuald/go-ordered-json"
 )
 
@@ -32,8 +32,7 @@ func main() {
 	matches, err := zglob.Glob(*files)
 	app.FatalIfError(err, "failed to parse glob: %s", *files)
 
-	var dmp = diffmatchpatch.New()
-
+	var failed bool
 	for _, match := range matches {
 		file, err := os.Open(match)
 		app.FatalIfError(err, "failed to open file: %s", match)
@@ -52,8 +51,20 @@ func main() {
 				app.FatalIfError(ioutil.WriteFile(match, out, 0), "failed to write json file: %s", match)
 				continue
 			}
-			diffs := dmp.DiffMain(string(bts), string(out), false)
-			app.Errorf("file %s differs:\n%s\n", match, dmp.DiffPrettyText(diffs))
+
+			diff, err := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
+				A:        difflib.SplitLines(string(bts)),
+				B:        difflib.SplitLines(string(out)),
+				FromFile: "Original",
+				ToFile:   "Formatted",
+				Context:  3,
+			})
+			app.FatalIfError(err, "failed to diff file: %s", match)
+			app.Errorf("file %s differs:\n%s\n", match, diff)
+			failed = true
 		}
+	}
+	if failed {
+		app.Fatalf("some files are not properly formated, check above\n")
 	}
 }
