@@ -1,0 +1,58 @@
+# This is an example goreleaser.yaml file with some sane defaults.
+# Make sure to check the documentation at http://goreleaser.com
+before:
+  hooks:
+  - go mod download
+builds:
+- env:
+  - CGO_ENABLED=0
+  goarch:
+  - amd64
+  goos:
+  - linux
+  - darwin
+dockers:
+- image_templates:
+  - "caarlos0/jsonfmt:latest"
+  - "caarlos0/jsonfmt:{{ .Tag }}"
+  build_flag_templates:
+  - "--label=org.label-schema.schema-version=1.0"
+  - "--label=org.label-schema.version={{ .Version }}"
+  - "--label=org.label-schema.name={{ .ProjectName }}"
+brew:
+  github:
+    owner: caarlos0
+    name: homebrew-tap
+  folder: Formula
+  homepage:  https://carlosbecker.com
+  description: Like gofmt, but for JSON files
+  test: |
+    system "#{bin}/gofmt -v"
+# TODO: add scoop support
+# scoop:
+#   bucket:
+#     owner: caarlos0
+#     name: scoop-bucket
+#   homepage:  http://carlosbecker.com
+#   description: Like gofmt, but for JSON files
+#   license: MIT
+nfpm:
+  homepage:  http://carlosbecker.com
+  description: Like gofmt, but for JSON files
+  maintainer: Carlos Alexandro Becker <root@carlosbecker.com>
+  license: MIT
+  vendor: Carlos Becker
+  formats:
+  - deb
+  - rpm
+  dependencies:
+  - git
+  recommends:
+  - rpm
+snapcraft:
+  summary: Like gofmt, but for JSON files
+  description: |
+    jsonfmt can check and format your JSON files in a reliable way, so they
+    all of them look always the same.
+  grade: stable
+  publish: true
