@@ -65,6 +65,6 @@ func main() {
 		}
 	}
 	if failed {
-		app.Fatalf("some files are not properly formated, check above\n")
+		app.Fatalf("some files are not properly formated, check above")
 	}
 }

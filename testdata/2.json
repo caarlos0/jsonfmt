@@ -1,9 +1,10 @@
-[
-    {
+{
+  "zzzz": 1,
+   "baz": {
     "foo": 1,
     "bar": 2,
     "test": false
         }
 
 
-]
+  }
