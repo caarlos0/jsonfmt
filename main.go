@@ -14,8 +14,6 @@ import (
 
 var (
 	version = "master"
-	commit  = "none"
-	date    = "unknown"
 
 	app      = kingpin.New("jsonfmt", "Like gofmt, but for JSON")
 	globs    = app.Arg("files", "glob of the files you want to check").Default("**/*.json").Strings()
@@ -25,13 +23,14 @@ var (
 )
 
 func main() {
-	app.Version(fmt.Sprintf("%v, commit %v, built at %v", version, commit, date))
+	app.Version(fmt.Sprintf("%s version %s", app.Name, version))
 	app.HelpFlag.Short('h')
 	app.VersionFlag.Short('v')
 
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	var failed bool
+Globs:
 	for _, glob := range *globs {
 		matches, err := zglob.Glob(glob)
 		app.FatalIfError(err, "failed to parse glob: %s", glob)
@@ -67,11 +66,8 @@ func main() {
 
 			failed = true
 			if *failfast {
-				break
+				break Globs
 			}
-		}
-		if failed && *failfast {
-			break
 		}
 	}
 	if failed {
