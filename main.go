@@ -56,7 +56,7 @@ Globs:
 
 			diff, err := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
 				A:        difflib.SplitLines(string(bts)),
-				B:        difflib.SplitLines(string(out.Bytes())),
+				B:        difflib.SplitLines(out.String()),
 				FromFile: "Original",
 				ToFile:   "Formatted",
 				Context:  3,
