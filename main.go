@@ -35,35 +35,31 @@ func main() {
 		app.FatalIfError(err, "failed to parse glob: %s", glob)
 
 		for _, match := range matches {
-			file, err := os.Open(match)
-			app.FatalIfError(err, "failed to open file: %s", match)
-			defer file.Close()
-			bts, err := ioutil.ReadAll(file)
+			bts, err := ioutil.ReadFile(match)
 			app.FatalIfError(err, "failed to read file: %s", match)
-			_ = file.Close()
-
-			var tmp json.RawMessage
-			app.FatalIfError(json.Unmarshal(bts, &tmp), "failed to parse json file: %s", match)
-			out, err := json.MarshalIndent(tmp, "", "  ")                 // TODO: support to customize indent
-			app.FatalIfError(err, "failed to parse json file: %s", match) // XXX: improve error msg
-			out = append(out, '\n')
-			if !bytes.Equal(bts, out) {
-				if *write {
-					app.FatalIfError(ioutil.WriteFile(match, out, 0), "failed to write json file: %s", match)
-					continue
-				}
-
-				diff, err := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
-					A:        difflib.SplitLines(string(bts)),
-					B:        difflib.SplitLines(string(out)),
-					FromFile: "Original",
-					ToFile:   "Formatted",
-					Context:  3,
-				})
-				app.FatalIfError(err, "failed to diff file: %s", match)
-				app.Errorf("file %s differs:\n%s\n", match, diff)
-				failed = true
+			var out bytes.Buffer
+			err = json.Indent(&out, bytes.TrimSpace(bts), "", "  ") // TODO: support to customize indent
+			app.FatalIfError(err, "failed to format json file: %s", match)
+			out.Write([]byte{'\n'})
+			if bytes.Equal(bts, out.Bytes()) {
+				continue
 			}
+			if *write {
+				err := ioutil.WriteFile(match, out.Bytes(), 0)
+				app.FatalIfError(err, "failed to write json file: %s", match)
+				continue
+			}
+
+			diff, err := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
+				A:        difflib.SplitLines(string(bts)),
+				B:        difflib.SplitLines(string(out.Bytes())),
+				FromFile: "Original",
+				ToFile:   "Formatted",
+				Context:  3,
+			})
+			app.FatalIfError(err, "failed to diff file: %s", match)
+			app.Errorf("file %s differs:\n%s\n", match, diff)
+			failed = true
 		}
 	}
 	if failed {
