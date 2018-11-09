@@ -12,6 +12,7 @@ import (
 	"github.com/pmezard/go-difflib/difflib"
 )
 
+// nolint: gochecknoglobals
 var (
 	version = "master"
 
