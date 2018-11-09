@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -9,7 +10,6 @@ import (
 	"github.com/alecthomas/kingpin"
 	zglob "github.com/mattn/go-zglob"
 	"github.com/pmezard/go-difflib/difflib"
-	json "github.com/virtuald/go-ordered-json"
 )
 
 var (
@@ -41,7 +41,7 @@ func main() {
 		app.FatalIfError(err, "failed to read file: %s", match)
 		_ = file.Close()
 
-		var tmp json.OrderedObject
+		var tmp json.RawMessage
 		app.FatalIfError(json.Unmarshal(bts, &tmp), "failed to parse json file: %s", match)
 		out, err := json.MarshalIndent(tmp, "", "  ")
 		app.FatalIfError(err, "failed to parse json file: %s", match) // XXX: improve error msg

@@ -8,6 +8,4 @@ require (
 	github.com/mattn/go-zglob v0.0.0-20180803001819-2ea3427bfa53
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/stretchr/testify v1.2.2 // indirect
-	github.com/virtuald/go-ordered-json v0.0.0-20170621173500-b18e6e673d74
-	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f // indirect
 )
