@@ -17,8 +17,11 @@ var (
 	date    = "unknown"
 
 	app   = kingpin.New("jsonfmt", "Like gofmt, but for JSON")
-	write = app.Flag("write", "write changes to the files").Short('w').Bool()
 	files = app.Arg("files", "glob of the files you want to check").Strings()
+
+	write    = app.Flag("write", "write changes to the files").Short('w').Bool()
+	indent   = app.Flag("indent", "characteres used to indend the json").Short('i').Default("  ").String()
+	failfast = app.Flag("failfast", "fail on the first error").Bool()
 )
 
 func main() {
@@ -37,7 +40,7 @@ func main() {
 		bts, err := ioutil.ReadFile(file)
 		app.FatalIfError(err, "failed to read file: %s", file)
 		var out bytes.Buffer
-		err = json.Indent(&out, bytes.TrimSpace(bts), "", "  ") // TODO: support to customize indent
+		err = json.Indent(&out, bytes.TrimSpace(bts), "", *indent)
 		app.FatalIfError(err, "failed to format json file: %s", file)
 		out.Write([]byte{'\n'})
 		if bytes.Equal(bts, out.Bytes()) {
@@ -59,6 +62,9 @@ func main() {
 		app.FatalIfError(err, "failed to diff file: %s", file)
 		app.Errorf("file %s differs:\n%s\n", file, diff)
 		failed = true
+		if *failfast {
+			break
+		}
 	}
 	if failed {
 		app.Fatalf("some files are not properly formated, check above")
