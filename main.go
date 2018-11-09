@@ -35,6 +35,13 @@ Globs:
 	for _, glob := range *globs {
 		matches, err := zglob.Glob(glob)
 		app.FatalIfError(err, "failed to parse glob: %s", glob)
+		if len(matches) == 0 {
+			app.Errorf("no matches found: %s", glob)
+			failed = true
+			if *failfast {
+				break Globs
+			}
+		}
 
 		for _, match := range matches {
 			bts, err := ioutil.ReadFile(match)
@@ -72,6 +79,6 @@ Globs:
 		}
 	}
 	if failed {
-		app.Fatalf("some files are not properly formated, check above")
+		app.Fatalf("some files may not be properly formated, check above")
 	}
 }
