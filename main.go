@@ -19,7 +19,7 @@ var (
 	app      = kingpin.New("jsonfmt", "Like gofmt, but for JSON")
 	globs    = app.Arg("files", "glob of the files you want to check").Default("**/*.json").Strings()
 	write    = app.Flag("write", "write changes to the files").Short('w').Bool()
-	indent   = app.Flag("indent", "characteres used to indend the json").Short('i').Default("  ").String()
+	indent   = app.Flag("indent", "character string used for indentation").Short('i').Default("  ").String()
 	failfast = app.Flag("failfast", "fail on the first error").Bool()
 )
 
