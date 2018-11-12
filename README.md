@@ -6,31 +6,32 @@ Usage: `jsonfmt` or `jsonfmt -w` to autofix the issues.
 
 ## Install
 
-### macOS
+**homebrew**:
 
 ```sh
 brew install caarlos0/tap/jsonfmt
 ```
 
-### ubuntu
+**snapcraft**:
 
 ```sh
 snap install jsonfmt
 ```
 
-### other linux
-
-Download the `.deb` or `.rpm` from the [releases page][releases].
-
-### Docker
+**docker**:
 
 ```sh
 docker run -v $PWD:/data --workdir /data caarlos0/jsonfmt -h
 ```
 
-### other
+**deb/rpm**:
 
-Download the `tar.gz` file from the [releases page][releases] or build from
-source.
+Download the `.deb` or `.rpm` from the [releases page][releases] and
+install with `dpkg -i` and `rpm -i` respectively.
+
+**manually**:
+
+Download the pre-compiled binaries from the [releases page][releases] or
+clone the repo build from source.
 
 [releases]: https://github.com/caarlos0/jsonfmt/releases
