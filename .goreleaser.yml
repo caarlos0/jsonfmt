@@ -45,10 +45,6 @@ nfpm:
   formats:
   - deb
   - rpm
-  dependencies:
-  - git
-  recommends:
-  - rpm
 snapcraft:
   summary: Like gofmt, but for JSON files
   description: |
@@ -56,3 +52,4 @@ snapcraft:
     all of them look always the same.
   grade: stable
   publish: true
+  confinement: classic
