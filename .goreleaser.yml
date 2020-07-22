@@ -19,8 +19,9 @@ dockers:
   - "--label=org.label-schema.schema-version=1.0"
   - "--label=org.label-schema.version={{ .Version }}"
   - "--label=org.label-schema.name={{ .ProjectName }}"
-brew:
-  github:
+brews:
+-
+  tap:
     owner: caarlos0
     name: homebrew-tap
   folder: Formula
@@ -36,7 +37,8 @@ brew:
 #   homepage:  http://carlosbecker.com
 #   description: Like gofmt, but for JSON files
 #   license: MIT
-nfpm:
+nfpms:
+-
   homepage:  http://carlosbecker.com
   description: Like gofmt, but for JSON files
   maintainer: Carlos Alexandro Becker <root@carlosbecker.com>
@@ -45,7 +47,8 @@ nfpm:
   formats:
   - deb
   - rpm
-snapcraft:
+snapcrafts:
+-
   summary: Like gofmt, but for JSON files
   description: |
     jsonfmt can check and format your JSON files in a reliable way, so they
