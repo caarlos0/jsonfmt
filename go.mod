@@ -1,6 +1,6 @@
 module github.com/caarlos0/jsonfmt
 
-go 1.14
+go 1.15
 
 require (
 	github.com/alecthomas/kingpin v2.2.6+incompatible
