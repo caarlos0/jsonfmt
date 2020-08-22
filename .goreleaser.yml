@@ -55,4 +55,7 @@ snapcrafts:
     all of them look always the same.
   grade: stable
   publish: true
-  confinement: classic
+  apps:
+    jsonfmt:
+      plugs: ["home"]
+      command: jsonfmt
