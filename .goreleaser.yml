@@ -47,15 +47,4 @@ nfpms:
   formats:
   - deb
   - rpm
-snapcrafts:
--
-  summary: Like gofmt, but for JSON files
-  description: |
-    jsonfmt can check and format your JSON files in a reliable way, so they
-    all of them look always the same.
-  grade: stable
-  publish: true
-  apps:
-    jsonfmt:
-      plugs: ["home"]
-      command: jsonfmt
+# TODO: apk
