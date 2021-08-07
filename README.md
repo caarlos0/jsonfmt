@@ -12,16 +12,29 @@ Usage: `jsonfmt` or `jsonfmt -w` to autofix the issues.
 brew install caarlos0/tap/jsonfmt
 ```
 
-**snapcraft**:
-
-```sh
-snap install jsonfmt
-```
-
 **docker**:
 
 ```sh
 docker run -v $PWD:/data --workdir /data caarlos0/jsonfmt -h
+```
+
+**apt**:
+
+```sh
+echo 'deb [trusted=yes] https://repo.caarlos0.com/apt/ /' | sudo tee /etc/apt/sources.list.d/caarlos0.list
+sudo apt update
+sudo apt install jsonfmt
+```
+
+**yum**:
+
+```sh
+echo '[caarlos0]
+name=caarlos0
+baseurl=https://repo.caarlos0.com/yum/
+enabled=1
+gpgcheck=0' | sudo tee /etc/yum.repos.d/caarlos0.repo
+sudo yum install jsonfmt
 ```
 
 **deb/rpm**:

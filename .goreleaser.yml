@@ -8,6 +8,8 @@ includes:
       url: caarlos0/goreleaserfiles/main/package.yml
   - from_url:
       url: caarlos0/goreleaserfiles/main/release.yml
+  - from_url:
+      url: caarlos0/goreleaserfiles/main/docker.yml
 
 furies:
 - account: caarlos0
