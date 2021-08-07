@@ -1,50 +1,13 @@
-# This is an example goreleaser.yaml file with some sane defaults.
-# Make sure to check the documentation at http://goreleaser.com
-before:
-  hooks:
-  - go mod download
-builds:
-- env:
-  - CGO_ENABLED=0
-  goarch:
-  - amd64
-  goos:
-  - linux
-  - darwin
-dockers:
-- image_templates:
-  - "caarlos0/jsonfmt:latest"
-  - "caarlos0/jsonfmt:{{ .Tag }}"
-  build_flag_templates:
-  - "--label=org.label-schema.schema-version=1.0"
-  - "--label=org.label-schema.version={{ .Version }}"
-  - "--label=org.label-schema.name={{ .ProjectName }}"
-brews:
--
-  tap:
-    owner: caarlos0
-    name: homebrew-tap
-  folder: Formula
-  homepage:  https://carlosbecker.com
+variables:
+  homepage: https://github.com/caarlos0/jsonfmt
   description: Like gofmt, but for JSON files
-  test: |
-    system "#{bin}/gofmt -v"
-# TODO: add scoop support
-# scoop:
-#   bucket:
-#     owner: caarlos0
-#     name: scoop-bucket
-#   homepage:  http://carlosbecker.com
-#   description: Like gofmt, but for JSON files
-#   license: MIT
-nfpms:
--
-  homepage:  http://carlosbecker.com
-  description: Like gofmt, but for JSON files
-  maintainer: Carlos Alexandro Becker <root@carlosbecker.com>
-  license: MIT
-  vendor: Carlos Becker
-  formats:
-  - deb
-  - rpm
-# TODO: apk
+includes:
+  - from_url:
+      url: caarlos0/goreleaserfiles/main/build.yml
+  - from_url:
+      url: caarlos0/goreleaserfiles/main/package.yml
+  - from_url:
+      url: caarlos0/goreleaserfiles/main/release.yml
+
+furies:
+- account: caarlos0
