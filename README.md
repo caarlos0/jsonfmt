@@ -48,3 +48,9 @@ Download the pre-compiled binaries from the [releases page][releases] or
 clone the repo build from source.
 
 [releases]: https://github.com/caarlos0/jsonfmt/releases
+
+
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/caarlos0/jsonfmt.svg)](https://starchart.cc/caarlos0/jsonfmt)
+
