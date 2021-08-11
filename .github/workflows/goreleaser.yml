@@ -34,7 +34,7 @@ jobs:
         with:
           registry: ghcr.io
           username: caarlos0
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GH_PAT }}
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
