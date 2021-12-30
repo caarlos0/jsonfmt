@@ -7,29 +7,31 @@ import (
 	"io"
 	"os"
 
+	"github.com/goreleaser/fileglob"
 	"github.com/hashicorp/go-multierror"
-	zglob "github.com/mattn/go-zglob"
 	"github.com/pmezard/go-difflib/difflib"
 	"github.com/spf13/cobra"
 )
 
-var rootCmd = &cobra.Command{
-	Use:          "jsonfmt",
-	Short:        "Like gofmt, but for JSON.",
-	Long:         `A fast and 0-options way to format JSON files`,
-	Args:         cobra.ArbitraryArgs,
-	SilenceUsage: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) == 0 {
-			args = []string{"**/*.json"}
-		}
-		return doRun(args)
-	},
-}
-var version = "master"
-var write bool
-var failfast bool
-var indent string
+var (
+	version  = "master"
+	write    bool
+	failfast bool
+	indent   string
+	rootCmd  = &cobra.Command{
+		Use:          "jsonfmt",
+		Short:        "Like gofmt, but for JSON.",
+		Long:         `A fast and 0-options way to format JSON files`,
+		Args:         cobra.ArbitraryArgs,
+		SilenceUsage: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				args = []string{"**/*.json"}
+			}
+			return doRun(args)
+		},
+	}
+)
 
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&write, "write", "w", false, "write changes to the files")
@@ -108,7 +110,7 @@ func findFiles(globs []string) ([]*os.File, error) {
 	var rerr error
 
 	for _, glob := range globs {
-		matches, err := zglob.Glob(glob)
+		matches, err := fileglob.Glob(glob, fileglob.MaybeRootFS, fileglob.MatchDirectoryIncludesContents)
 		if err != nil {
 			return files, err
 		}
