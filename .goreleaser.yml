@@ -3,14 +3,20 @@ variables:
   repository: https://github.com/caarlos0/jsonfmt
   description: Like gofmt, but for JSON files
 includes:
-  - from_url:
-      url: caarlos0/goreleaserfiles/main/build.yml
-  - from_url:
-      url: caarlos0/goreleaserfiles/main/package.yml
-  - from_url:
-      url: caarlos0/goreleaserfiles/main/release.yml
-  - from_url:
-      url: caarlos0/goreleaserfiles/main/docker.yml
+- from_url:
+    url: caarlos0/goreleaserfiles/main/build.yml
+- from_url:
+    url: caarlos0/goreleaserfiles/main/package.yml
+- from_url:
+    url: caarlos0/goreleaserfiles/main/release.yml
+- from_url:
+    url: caarlos0/goreleaserfiles/main/docker.yml
+- from_url:
+    url: caarlos0/goreleaserfiles/main/sbom.yml
+- from_url:
+    url: caarlos0/goreleaserfiles/main/cosign_checksum.yml
+- from_url:
+    url: caarlos0/goreleaserfiles/main/cosign_docker.yml
 
 furies:
 - account: caarlos0
