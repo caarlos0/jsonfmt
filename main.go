@@ -4,81 +4,126 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
-	"github.com/alecthomas/kingpin"
+	"github.com/hashicorp/go-multierror"
 	zglob "github.com/mattn/go-zglob"
 	"github.com/pmezard/go-difflib/difflib"
+	"github.com/spf13/cobra"
 )
 
-// nolint: gochecknoglobals
-var (
-	version = "master"
+var rootCmd = &cobra.Command{
+	Use:          "jsonfmt",
+	Short:        "Like gofmt, but for JSON.",
+	Long:         `A fast and 0-options way to format JSON files`,
+	Args:         cobra.ArbitraryArgs,
+	SilenceUsage: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) == 0 {
+			args = []string{"**/*.json"}
+		}
+		return doRun(args)
+	},
+}
+var version = "master"
+var write bool
+var failfast bool
+var indent string
 
-	app      = kingpin.New("jsonfmt", "Like gofmt, but for JSON")
-	globs    = app.Arg("files", "glob of the files you want to check").Default("**/*.json").Strings()
-	write    = app.Flag("write", "write changes to the files").Short('w').Bool()
-	indent   = app.Flag("indent", "character string used for indentation").Short('i').Default("  ").String()
-	failfast = app.Flag("failfast", "fail on the first error").Bool()
-)
+func init() {
+	rootCmd.PersistentFlags().BoolVarP(&write, "write", "w", false, "write changes to the files")
+	rootCmd.PersistentFlags().BoolVarP(&failfast, "failfast", "f", false, "exit on first error")
+	rootCmd.PersistentFlags().StringVarP(&indent, "indent", "i", "  ", "indentation string")
+
+	rootCmd.Version = version
+}
 
 func main() {
-	app.Version(fmt.Sprintf("%s version %s", app.Name, version))
-	app.HelpFlag.Short('h')
-	app.VersionFlag.Short('v')
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
+}
 
-	kingpin.MustParse(app.Parse(os.Args[1:]))
+func doRun(globs []string) error {
+	var rerr error
 
-	var failed bool
-Globs:
-	for _, glob := range *globs {
-		matches, err := zglob.Glob(glob)
-		app.FatalIfError(err, "failed to parse glob: %s", glob)
-		if len(matches) == 0 {
-			app.Errorf("no matches found: %s", glob)
-			failed = true
-			if *failfast {
-				break Globs
+	files, err := findFiles(globs)
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		bts, err := io.ReadAll(file)
+		file.Close()
+		if err != nil {
+			return err
+		}
+
+		var out bytes.Buffer
+		if err := json.Indent(&out, bytes.TrimSpace(bts), "", indent); err != nil {
+			return fmt.Errorf("failed to format json file: %s: %v", file.Name(), err)
+		}
+		if _, err := out.Write([]byte{'\n'}); err != nil {
+			return fmt.Errorf("failed to write: %v", err)
+		}
+
+		if bytes.Equal(bts, out.Bytes()) {
+			continue
+		}
+
+		if write {
+			if err := os.WriteFile(file.Name(), out.Bytes(), 0); err != nil {
+				return fmt.Errorf("failed to write file: %s: %v", file.Name(), err)
 			}
+			continue
+		}
+
+		diff, err := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
+			A:        difflib.SplitLines(string(bts)),
+			B:        difflib.SplitLines(out.String()),
+			FromFile: "Original",
+			ToFile:   "Formatted",
+			Context:  3,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to generate diff: %s: %v", file.Name(), err)
+		}
+
+		rerr = multierror.Append(rerr, fmt.Errorf("file %s differs:\n\n%s", file.Name(), diff))
+
+		if failfast {
+			break
+		}
+	}
+	return rerr
+}
+
+func findFiles(globs []string) ([]*os.File, error) {
+	if len(globs) == 1 && (globs)[0] == "-" {
+		return []*os.File{os.Stdin}, nil
+	}
+
+	var files []*os.File
+	var rerr error
+
+	for _, glob := range globs {
+		matches, err := zglob.Glob(glob)
+		if err != nil {
+			return files, err
+		}
+		if len(matches) == 0 {
+			multierror.Append(rerr, fmt.Errorf("no matches found: %s", glob))
 		}
 
 		for _, match := range matches {
-			bts, err := ioutil.ReadFile(match)
-			app.FatalIfError(err, "failed to read file: %s", match)
-
-			var out bytes.Buffer
-			err = json.Indent(&out, bytes.TrimSpace(bts), "", *indent)
-			app.FatalIfError(err, "failed to format json file: %s", match)
-			out.Write([]byte{'\n'})
-
-			if bytes.Equal(bts, out.Bytes()) {
-				continue
+			f, err := os.Open(match)
+			if err != nil {
+				multierror.Append(rerr, err)
 			}
-
-			if *write {
-				err := ioutil.WriteFile(match, out.Bytes(), 0)
-				app.FatalIfError(err, "failed to write json file: %s", match)
-				continue
-			}
-
-			diff, err := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
-				A:        difflib.SplitLines(string(bts)),
-				B:        difflib.SplitLines(out.String()),
-				FromFile: "Original",
-				ToFile:   "Formatted",
-				Context:  3,
-			})
-			app.FatalIfError(err, "failed to diff file: %s", match)
-			app.Errorf("file %s differs:\n%s\n", match, diff)
-
-			failed = true
-			if *failfast {
-				break Globs
-			}
+			files = append(files, f)
 		}
 	}
-	if failed {
-		app.Fatalf("some files may not be properly formated, check above")
-	}
+
+	return files, rerr
 }

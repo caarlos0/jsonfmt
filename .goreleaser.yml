@@ -1,5 +1,6 @@
 variables:
   homepage: https://github.com/caarlos0/jsonfmt
+  repository: https://github.com/caarlos0/jsonfmt
   description: Like gofmt, but for JSON files
 includes:
   - from_url:
