@@ -56,8 +56,7 @@ func doRun(globs []string) error {
 	}
 
 	for _, file := range files {
-		bts, err := io.ReadAll(file)
-		file.Close()
+		bts, err := file.Read()
 		if err != nil {
 			return err
 		}
@@ -75,7 +74,7 @@ func doRun(globs []string) error {
 		}
 
 		if write {
-			if err := os.WriteFile(file.Name(), out.Bytes(), 0); err != nil {
+			if err := file.Write(out.Bytes()); err != nil {
 				return fmt.Errorf("failed to write file: %s: %v", file.Name(), err)
 			}
 			continue
@@ -101,12 +100,12 @@ func doRun(globs []string) error {
 	return rerr
 }
 
-func findFiles(globs []string) ([]*os.File, error) {
+func findFiles(globs []string) ([]file, error) {
 	if len(globs) == 1 && (globs)[0] == "-" {
-		return []*os.File{os.Stdin}, nil
+		return []file{stdInOut{}}, nil
 	}
 
-	var files []*os.File
+	var files []file
 	var rerr error
 
 	for _, glob := range globs {
@@ -119,13 +118,38 @@ func findFiles(globs []string) ([]*os.File, error) {
 		}
 
 		for _, match := range matches {
-			f, err := os.Open(match)
-			if err != nil {
-				multierror.Append(rerr, err)
-			}
-			files = append(files, f)
+			files = append(files, realFile{match})
 		}
 	}
 
 	return files, rerr
+}
+
+type file interface {
+	Name() string
+	Read() ([]byte, error)
+	Write(b []byte) error
+}
+
+type stdInOut struct{}
+
+func (f stdInOut) Name() string          { return "-" }
+func (f stdInOut) Read() ([]byte, error) { return io.ReadAll(os.Stdin) }
+func (f stdInOut) Write(b []byte) error {
+	_, err := os.Stdout.Write(b)
+	return err
+}
+
+type realFile struct {
+	path string
+}
+
+func (f realFile) Name() string          { return f.path }
+func (f realFile) Read() ([]byte, error) { return os.ReadFile(f.path) }
+func (f realFile) Write(b []byte) error {
+	stat, err := os.Stat(f.Name())
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(f.Name(), b, stat.Mode())
 }
