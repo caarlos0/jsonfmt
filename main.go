@@ -114,7 +114,7 @@ func findFiles(globs []string) ([]file, error) {
 			return files, err
 		}
 		if len(matches) == 0 {
-			multierror.Append(rerr, fmt.Errorf("no matches found: %s", glob))
+			rerr = multierror.Append(rerr, fmt.Errorf("no matches found: %s", glob))
 		}
 
 		for _, match := range matches {
