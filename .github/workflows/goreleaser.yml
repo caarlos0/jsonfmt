@@ -26,7 +26,7 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-      - uses: sigstore/cosign-installer@v2.4.0
+      - uses: sigstore/cosign-installer@v2.8.0
       - uses: anchore/sbom-action/download-syft@v0.11.0
       - uses: docker/setup-qemu-action@v2
       - uses: docker/login-action@v2
