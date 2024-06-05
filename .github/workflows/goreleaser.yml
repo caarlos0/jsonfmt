@@ -38,7 +38,7 @@ jobs:
           registry: ghcr.io
           username: caarlos0
           password: ${{ secrets.GH_PAT }}
-      - uses: goreleaser/goreleaser-action@v5
+      - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser-pro
           version: latest
