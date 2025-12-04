@@ -6,7 +6,7 @@ require (
 	github.com/goreleaser/fileglob v1.4.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/pmezard/go-difflib v1.0.0
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 )
 
 require (
