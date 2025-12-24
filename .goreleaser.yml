@@ -1,9 +1,16 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema-pro.json
 version: 2
+pro: true
 
 variables:
   homepage: https://github.com/caarlos0/jsonfmt
   repository: https://github.com/caarlos0/jsonfmt
   description: Like gofmt, but for JSON files
+
+metadata:
+  homepage: https://github.com/caarlos0/jsonfmt
+  description: Like gofmt, but for JSON files
+
 includes:
   - from_url:
       url: caarlos0/goreleaserfiles/main/build.yml
@@ -12,7 +19,7 @@ includes:
   - from_url:
       url: caarlos0/goreleaserfiles/main/release.yml
   - from_url:
-      url: caarlos0/goreleaserfiles/main/docker.yml
+      url: caarlos0/goreleaserfiles/main/docker_v2.yml
   - from_url:
       url: caarlos0/goreleaserfiles/main/sbom.yml
   - from_url:
