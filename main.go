@@ -24,7 +24,7 @@ var (
 		Long:         `A fast and 0-options way to format JSON files`,
 		Args:         cobra.ArbitraryArgs,
 		SilenceUsage: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			if len(args) == 0 {
 				args = []string{"**/*.json"}
 			}
