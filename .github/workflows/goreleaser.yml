@@ -27,7 +27,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - uses: sigstore/cosign-installer@v4.0.0
-      - uses: anchore/sbom-action/download-syft@v0.20.11
+      - uses: anchore/sbom-action/download-syft@v0.21.0
       - uses: docker/setup-qemu-action@v3
       - uses: docker/login-action@v3
         with:
