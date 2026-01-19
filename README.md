@@ -9,7 +9,7 @@ Usage: `jsonfmt` or `jsonfmt -w` to autofix the issues.
 **homebrew**:
 
 ```sh
-brew install caarlos0/tap/jsonfmt
+brew install jsonfmt
 ```
 
 **docker**:
