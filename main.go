@@ -7,6 +7,10 @@ import (
 	"io"
 	"os"
 
+	"strconv"
+	"strings"
+
+	"github.com/editorconfig/editorconfig-core-go/v2"
 	"github.com/goreleaser/fileglob"
 	"github.com/hashicorp/go-multierror"
 	"github.com/pmezard/go-difflib/difflib"
@@ -24,11 +28,11 @@ var (
 		Long:         `A fast and 0-options way to format JSON files`,
 		Args:         cobra.ArbitraryArgs,
 		SilenceUsage: true,
-		RunE: func(_ *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
 				args = []string{"**/*.json"}
 			}
-			return doRun(args)
+			return doRun(args, cmd.PersistentFlags().Changed("indent"))
 		},
 	}
 )
@@ -47,7 +51,7 @@ func main() {
 	}
 }
 
-func doRun(globs []string) error {
+func doRun(globs []string, indentChanged bool) error {
 	var rerr error
 
 	files, err := findFiles(globs)
@@ -62,7 +66,7 @@ func doRun(globs []string) error {
 		}
 
 		var out bytes.Buffer
-		if err := json.Indent(&out, bytes.TrimSpace(bts), "", indent); err != nil {
+		if err := json.Indent(&out, bytes.TrimSpace(bts), "", computeIndent(file.Name(), indentChanged)); err != nil {
 			return fmt.Errorf("failed to format json file: %s: %v", file.Name(), err)
 		}
 		if _, err := out.Write([]byte{'\n'}); err != nil {
@@ -98,6 +102,38 @@ func doRun(globs []string) error {
 		}
 	}
 	return rerr
+}
+
+func computeIndent(filename string, indentChanged bool) string {
+	if indentChanged || filename == "-" {
+		return indent
+	}
+
+	ec, err := editorconfig.GetDefinitionForFilename(filename)
+
+	if err != nil {
+		return indent
+	}
+
+	indentStyle := ec.IndentStyle
+	indentSize := ec.IndentSize
+	tabWidth := ec.TabWidth
+
+	if indentStyle == "tab" || indentSize == "tab" {
+		return "\t"
+	}
+
+	if indentSize != "" {
+		if n, err := strconv.Atoi(indentSize); err == nil && n > 0 {
+			return strings.Repeat(" ", n)
+		}
+	}
+
+	if tabWidth > 0 {
+		return strings.Repeat(" ", tabWidth)
+	}
+
+	return indent
 }
 
 func findFiles(globs []string) ([]file, error) {
