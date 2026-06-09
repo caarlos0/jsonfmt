@@ -10,8 +10,11 @@ require (
 )
 
 require (
+	github.com/editorconfig/editorconfig-core-go/v2 v2.6.4 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
+	golang.org/x/mod v0.31.0 // indirect
+	gopkg.in/ini.v1 v1.67.0 // indirect
 )
